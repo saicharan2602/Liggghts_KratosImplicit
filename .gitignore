@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.part
+
+# run outputs (one run per folder; the folders themselves are kept by .gitkeep)
+/CSV/*
+/FORCES/*
+/STATUS/*
+/STL/*
+/LOG/*
+/RESULTS/*
+/LIGGGHTS/post/*
+/LIGGGHTS/POST/*
+/LIGGGHTS/MEASUREMENT/*
+!**/.gitkeep
+!/LOG/lmp_diff.txt
+!/RESULTS/checks.txt

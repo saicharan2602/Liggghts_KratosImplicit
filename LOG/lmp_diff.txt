@@ -1,0 +1,13 @@
+--- in_DRAW_DOWN_410.lmp (ANSYS deck, unchanged copy)
++++ in_DRAW_DOWN_KRATOS.lmp
+@@ -15 +15 @@
+-	shell "S:\START\Windows\00_CLEAN_UP.bat"  
++	shell "..\START\Windows\00_CLEAN_UP.bat"  
+@@ -30,2 +30,2 @@
+-    print "## Phase 1: init ANSYS(R) & generate STL ##"
+-    shell "S:\START\Windows\01_STL_DERIVATION.bat"                                   # ;generate Ini-STL --> fuer Windows
++    print "## Phase 1: init Kratos & generate STL ##"
++    shell "..\START\Windows\01_STL_DERIVATION.bat"                                   # ;generate Ini-STL --> fuer Windows
+@@ -283 +283 @@
+-												cmd S:\START\Windows\03_BULK_ANALYSIS.bat
++												cmd ..\START\Windows\03_BULK_ANALYSIS.bat

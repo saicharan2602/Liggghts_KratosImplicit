@@ -1,0 +1,4 @@
+# keep every file byte-exact (CRLF batch files, .lmp, STL)
+* -text
+# restart file (169 MB > GitHub 100 MB limit)
+*.bin filter=lfs diff=lfs merge=lfs -text

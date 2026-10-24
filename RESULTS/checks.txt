@@ -1,0 +1,12 @@
+=== 2026-10-24 18:27:24  check.py formats: ALL PASS
+  [PASS] mesh: 385 nodes, 340 elements, 77 clamped nodes
+  [PASS] AMESH numbering: elements 1, 60, 61, 340: corners I J K L counter-clockwise from lower left
+  [PASS] laser nodes: P1 = node 204 (-10, 0) mm, P2 = node 205 (0, 0) mm
+  [PASS] E12.6: 6 examples
+  [PASS] E14.6: 4 examples
+  [PASS] NODE_COORD header line 2: examples {1: '0', 2: '1.E-03', 300: '2.99E-01', 101: '1.E-01', 1001: '1', 1002: '1.001', 5199: '5.198'}; N = 1..5200 round-trip and style
+  [PASS] NODE_COORD header line 3: 1.E-03
+  [PASS] STL NODE_COORD_0.stl: 680 facets, element ids 1..340 twice in order, face 1, CRLF, E14.6, first facet as ANSYS
+  [PASS] NODE_COORD_1 structure: 2727 lines (7 + 680 x 4), header, 'tri,e,1', IJK then IKL, E12.6, CRLF
+  [PASS] forces reader: 340 rows read back, sums exact; 4/4 bad files rejected (339 rows, order, NaN, face 2)
+  [PASS] laser: undeformed 0; rigid rotation 0.2 rad: -44.5962 mm = -220 tan(0.2) = -44.5962 mm

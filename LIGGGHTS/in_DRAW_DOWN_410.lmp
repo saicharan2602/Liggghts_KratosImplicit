@@ -1,0 +1,449 @@
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------- DRAW_DOWN_MAIN_SIMULATION -----------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------- PROJECT: Test 4.1.++ -----------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------- 22.01.2026 --------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    #shell "del ../CSV/*"   #--> fuer Windows
+    #shell "del ../SAVE/*"
+    #shell "del ../FORCES/*"
+    #shell "del ../OUT/*"
+    #shell "del ../VTK/*"
+    #shell "del POST/*"
+	shell "S:\START\Windows\00_CLEAN_UP.bat"  
+
+    #;shell "rm ../CSV/*"     #--> fuer LINUX
+    #;shell "rm ../SAVE/*"
+    #;shell "rm ../FORCES/*"
+    #;shell "rm ../OUT/*"
+    #;shell "rm ../VTK/*"
+    #;shell "rm POST/*"
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------- START_PHASE_I --------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    print "## Phase 1: init ANSYS(R) & generate STL ##"
+    shell "S:\START\Windows\01_STL_DERIVATION.bat"                                   # ;generate Ini-STL --> fuer Windows
+    #;shell "/S/START/01_STL_DERIVATION.sh"                                                  # ;generate Ini-STL --> fuer LINUX
+    #shell mkdir POST
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------- STANDARD_KOPF --------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    atom_style      granular
+    atom_modify     map array
+    boundary        f f f
+    newton          off
+    echo            both
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------- VARIABLES ----------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+    ##variable    delta_t_DEM     equal   1e-5                                              # ;timestep DEM [sec] 2.5e-5
+    ##variable    delta_t_FEM     equal   1e-4                                               # ;timestep FEM [sec]     0.005
+	variable    delta_t_DEM     equal   2.5e-5                                              # ;timestep DEM [sec] 1e-5
+    variable    delta_t_FEM     equal   1e-3 #0.005       
+	variable    cpl_step       equal   ${delta_t_FEM}/${delta_t_DEM}                      # ;coupling stepsize [-] TODO
+    variable    dump_step       equal   ${cpl_step} #1 #TODO DEBUG 
+	variable 	Gesamtzeit		equal   5													# ;Gesamtzeit Simulation [sec]
+	variable	settlesteps	equal 0.5/${delta_t_DEM}
+	print cpl=${cpl_step}___dump=${dump_step} #1,1000
+	variable	dump_end		equal	${Gesamtzeit}/${delta_t_FEM}						# ;dump_end [-]# ;dumpstep [-]
+	variable    insertsteps     equal   ${Gesamtzeit}/${delta_t_DEM}					    # ;Gesamtzahl steps
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------- MAIN_MATERIAL_VARIABLES ---------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------- Kunststoffgranulat ------------------------------------------------------------------------------------------
+
+    #variable    cor             equal   0.2                                                 # ;coefficient of restitution [-]
+   # variable    bulk_dens       equal   577                                                 # ;real bulk dens [kg/m設  --> Kunststoffgranulat
+    #variable    poros           equal   0.385                                               # ;porosity [-]
+    #variable    dens            equal   ${bulk_dens}/(1-${poros})                           # ;particle density [kg/m設
+    #variable    poiss           equal   0.3                                                 # ;poisson ratio [-]
+    #variable    shearmod        equal   1e7                                                 # ;shear modulus [N/m淫
+    #variable    youngmod        equal   ${shearmod}*(2.0+2.0*${poiss})                      # ;young modulus [N/m淫
+
+    #variable    wallfricW       equal   0.148                                               # ;wall friction particles vs. galvanized  steel [-]
+    #variable    wallfricPW      equal   0.220                                               # ;wall friction particles vs. plexiglas [-]
+    #variable    wallfricHW      equal   0.                                                  # ;wall friction particles vs. help walls [-]
+
+    #variable    ff              equal   0.12                                                # ;coulomb friction between particles [-]
+    #variable    frf             equal   0.30                                                # ;rolling friction between particles [-]
+    #variable    CED             equal   0.0                                                 # ;cohesion ernergy density [J]
+
+#----------------------------------------------------------------------------------- Weizen ------------------------------------------------------------------------------------------------
+
+    variable    cor             equal   0.2                                                 # ;coefficient of restitution [-]
+    variable    bulk_dens       equal   743                                                 # ;real bulk dens [kg/m ]
+    variable    poros           equal   0.402                                               # ;porosity [-]
+    variable    dens            equal   ${bulk_dens}/(1-${poros})                           # ;particle density [
+   variable    poiss           equal   0.3                                                 # ;poisson ratio [-]
+    variable    shearmod        equal   1e7                                                 # ;shear modulus [N/m ]
+    variable    youngmod        equal   ${shearmod}*(2.0+2.0*${poiss})                      # ;young modulus [N/m ]
+
+    variable    wallfricW       equal   0.215                                               # ;wall friction particles vs. galvanized  steel [-]
+    variable    wallfricPW      equal   0.260                                               # ;wall friction particles vs. plexiglas [-]
+    variable    wallfricHW      equal   0.                                                  # ;wall friction particles vs. help walls [-]
+
+    variable    ff              equal   0.170                                               # ;coulomb friction between particles [-]
+    variable    frf             equal   0.180                                               # ;rolling friction between particles [-]
+    variable    CED             equal   0.0                                                 # ;cohesion ernergy density [J]
+
+#------------------------------------------------------------------------------- MOP60 Granular B ------------------------------------------------------------------------------------------
+
+    #;variable    cor             equal   0.2                                                 # ;coefficient of restitution [-]
+    #;variable    bulk_dens       equal   971                                                 # ;real bulk dens [kg/m ]
+    #;variable    poros           equal   0.487                                               # ;porosity [-]
+    #;variable    dens            equal   ${bulk_dens}/(1-${poros})                           # ;particle density [kg/m ]
+    #;variable    poiss           equal   0.3                                                 # ;poisson ratio [-]
+    #;variable    shearmod        equal   1e7                                                 # ;shear modulus [N/m ]
+    #;variable    youngmod        equal   ${shearmod}*(2.0+2.0*${poiss})                      # ;young modulus [N/m ]
+
+    #;variable    wallfricW       equal   0.208                                               # ;wall friction particles vs. galvanized  steel [-]
+    #;variable    wallfricPW      equal   0.183                                               # ;wall friction particles vs. plexiglas [-]
+    #;variable    wallfricHW      equal   0.                                                  # ;wall friction particles vs. help walls [-]
+
+    #;variable    ff              equal   0.5                                                 # ;coulomb friction between particles [-]
+    #;variable    frf             equal   0.3                                                 # ;rolling friction between particles [-]
+    #;variable    CED             equal   0.0                                                 # ;cohesion ernergy density [J]
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------- PARTICLE_PROPERTIES -----------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------- Kunststoffgranulat ------------------------------------------------------------------------------------------
+
+	#variable    d1              equal   0.0053                                              # ;particle diameter 1.fraction [m]
+    #variable    d2              equal   0.00475                                             # ;particle diameter 2.fraction [m]
+    #variable    d3              equal   0.00425                                             # ;particle diameter 3.fraction [m]
+    #variable    d4              equal   0.003775                                            # ;particle diameter 4.fraction [m]
+
+    #variable    mult_fac        equal   1                                                   # ;radius multilpcation factor
+
+    #variable    r1              equal   (${d1}/2)*${mult_fac}                               # ;particle radius 1.fraction [m]
+    #variable    r2              equal   (${d2}/2)*${mult_fac}                               # ;particle radius 2.fraction [m]
+    #variable    r3              equal   (${d3}/2)*${mult_fac}                               # ;particle radius 3.fraction [m]
+    #variable    r4              equal   (${d4}/2)*${mult_fac}                               # ;particle radius 4.fraction [m]
+
+    #variable    frac1           equal   0.15#;0.000219507                                         # ;percent ratio 1.fraction [%]
+    #variable    frac2           equal   0.20#;0.000268286                                         # ;percent ratio 2.fraction [%]
+    #variable    frac3           equal   0.30#;0.019389771                                         # ;percent ratio 3.fraction [%]
+    #variable    frac4           equal   0.35#;0.980122436                                         # ;percent ratio 4.fraction [%]
+    
+    #variable    vel_tric        equal   -3.0                                                # ;particle trickling magnitude [m/s]
+    
+   #variable    total_mass      equal   13                                                   # ;total mass in the shear box [kg]
+   #variable    Im_gen          equal   ${total_mass}/${t_trick}                            # ;theoretical particle insertion mass flow [kg/s]
+
+#----------------------------------------------------------------------------------- Weizen ------------------------------------------------------------------------------------------------
+
+    variable    d1              equal   0.0050                                             # ;particle diameter 1.fraction [m]
+    variable    d2              equal   0.0040                                             # ;particle diameter 2.fraction [m]
+    variable    d3              equal   0.0035                                             # ;particle diameter 3.fraction [m]
+    variable    d4              equal   0.0030                                            # ;particle diameter 4.fraction [m]
+
+    variable    mult_fac        equal   1                                                   # ;radius multilpcation factor
+
+    variable    r1              equal   (${d1}/2)*${mult_fac}                               # ;particle radius 1.fraction [m]
+    variable    r2              equal   (${d2}/2)*${mult_fac}                               # ;particle radius 2.fraction [m]
+    variable    r3              equal   (${d3}/2)*${mult_fac}                               # ;particle radius 3.fraction [m]
+   variable    r4              equal   (${d4}/2)*${mult_fac}                               # ;particle radius 4.fraction [m]
+
+    variable    frac1           equal   0.10                                               # ;percent ratio 1.fraction [%]
+    variable    frac2           equal   0.20                                               # ;percent ratio 2.fraction [%]
+    variable    frac3           equal   0.35                                               # ;percent ratio 3.fraction [%]
+    variable    frac4           equal   0.35                                               # ;percent ratio 4.fraction [%]
+    
+    variable    vel_tric        equal   -3.0                                                # ;particle trickling magnitude [m/s]
+    
+    variable    total_mass      equal   6    #6                                               # ;total mass in the shear box [kg]
+    #variable    Im_gen          equal   ${total_mass}/${t_trick}                            # ;theoretical particle insertion mass flow [kg/s]
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    #variable    sc_01           equal   1.0                                                 # ;scale factor clump --> 1.fraction [-]            --> clump
+
+#------------------------------------------------------------------------------- MOP60 Granular B ------------------------------------------------------------------------------------------
+
+    #;variable    d1              equal   0.00600                                             # ;particle diameter 1.fraction [m]
+    #;variable    d2              equal   0.00500                                             # ;particle diameter 2.fraction [m]
+    #;variable    d3              equal   0.00400                                             # ;particle diameter 3.fraction [m]
+    #;variable    d4              equal   0.00250                                              # ;particle diameter 4.fraction [m]
+
+    #;variable    mult_fac        equal   1                                                   # ;radius multilpcation factor
+
+    #;variable    r1              equal   (${d1}/2)*${mult_fac}                               # ;particle radius 1.fraction [m]
+    #;variable    r2              equal   (${d2}/2)*${mult_fac}                               # ;particle radius 2.fraction [m]
+    #;variable    r3              equal   (${d3}/2)*${mult_fac}                               # ;particle radius 3.fraction [m]
+    #;variable    r4              equal   (${d4}/2)*${mult_fac}                               # ;particle radius 4.fraction [m]
+
+    #;variable    frac1           equal   0.40                                                 # ;percent ratio 1.fraction [%]
+    #;variable    frac2           equal   0.35                                                 # ;percent ratio 2.fraction [%]
+    #;variable    frac3           equal   0.20                                                 # ;percent ratio 3.fraction [%]
+    #;variable    frac4           equal   0.05                                                 # ;percent ratio 4.fraction [%]
+    
+    #;variable    vel_tric        equal   -3.0                                                # ;particle trickling magnitude [m/s]
+    
+    #;variable    total_mass      equal   10                                                   # ;total mass in the shear box [kg]
+    #;variable    Im_gen          equal   ${total_mass}/${t_trick}                            # ;theoretical particle insertion mass flow [kg/s]
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------ SIMULATION_REGION ------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    processors      * 1 1
+    communicate     single vel yes
+    units           si                                                                      # ;choose si-units
+    region          reg block -0.4 0.4 -0.11 0.11 -0.02 1.83 units box                      # ;region dimensions
+
+    neighbor        0.001 bin                                                               # ;neighbor definitions [m]
+    neigh_modify    delay 0
+    read_restart    TRICK/RESTART/restart300000.bin  #TRICK/RESTART/restart40000.bin
+    #create_box      4 reg 																	#auskommentieren wenn aus restart starten
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------- SET_MATERIAL_PROPERTIES ---------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    fix             m1 all property/global youngsModulus peratomtype                                ${youngmod} ${youngmod} ${youngmod} ${youngmod}
+
+    fix             m2 all property/global poissonsRatio peratomtype                                ${poiss} ${poiss} ${poiss} ${poiss}
+
+    fix             m3 all property/global coefficientRestitution peratomtypepair 4                 ${cor} ${cor} ${cor} ${cor} &
+                                                                                                    ${cor} ${cor} ${cor} ${cor} &
+                                                                                                    ${cor} ${cor} ${cor} ${cor} &
+                                                                                                    ${cor} ${cor} ${cor} ${cor}
+
+    fix             m4 all property/global coefficientFriction peratomtypepair 4                    ${ff}         ${wallfricW} ${wallfricPW} ${wallfricHW} &
+                                                                                                    ${wallfricW}  0            0             0             &
+                                                                                                    ${wallfricPW} 0            0             0             &
+                                                                                                    ${wallfricHW} 0            0             0
+                                    
+    fix             m5 all property/global coefficientRollingFriction peratomtypepair 4             ${frf} ${frf} ${frf} ${frf} &
+                                                                                                    ${frf} 0      0      0      & 
+                                                                                                    ${frf} 0      0      0      &
+                                                                                                    ${frf} 0      0      0   
+
+    fix             m6 all property/global cohesionEnergyDensity peratomtypepair 4                  ${CED} 0      0      0      &
+                                                                                                    0      0      0      0      &
+                                                                                                    0      0      0      0      &
+                                                                                                    0      0      0      0 
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------- SET_TIMESTEP_AND_CONTACT_MODEL ------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    timestep        ${delta_t_DEM}                                                                  # ;set timestep DEM [sec]
+
+    pair_style      gran model hertz tangential history rolling_friction epsd2 limitForce on        # ;noTension on 
+    pair_coeff      * *
+
+    fix             gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+##debug cri
+#create_atoms 1 single 0 0 0 units box #hopefully
+#run 1
+#set region reg diameter 0.001 #?!test
+##debug
+ 
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------- CAD_IMPORT_DEFINITIONS ----------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    ##fix         beam all mesh/surface/stress file D:/SimBa/STL/NODE_COORD_0.stl type 2 scale 1 surface_vel 0 0 0 stress on mean ${dump_step} #neu HW!!! 
+	
+	fix         beam all mesh/surface/stress/fem file ../STL/NODE_COORD_0.stl type 2 stress on mean ${cpl_step} &
+												fname ../CSV/NODE_COORD_ &
+												scale 1 &
+												cmd S:\START\Windows\03_BULK_ANALYSIS.bat
+												#NEU 2026 CRI: deform X(t+dt)=X(t)+dX(dt)
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    fix         u_b all mesh/surface file STL/REAL/UPPER_BOX.stl type 3 scale 0.001 curvature 1e-5
+    fix         l_b all mesh/surface file STL/LOWER_BOX.stl type 3 scale 0.001 curvature 1e-5
+
+	fix         g_l all mesh/surface file STL/REAL/GATE_LEFT_40mm.stl type 2 scale 0.001 curvature 1e-5 #GATE_LEFT.stl
+    fix         g_r all mesh/surface file STL/REAL/GATE_RIGHT_40mm.stl type 2 scale 0.001 curvature 1e-5 #GATE_RIGHT.stl
+
+	fix         f_f all mesh/surface file STL/REAL/FLAP_FRONT.stl type 2 scale 0.001 curvature 1e-5
+    fix         f_b all mesh/surface file STL/REAL/FLAP_BACK.stl type 2 scale 0.001 curvature 1e-5
+    
+    fix         gst all mesh/surface file STL/REAL/GESTELL.stl type 2 scale 0.001 curvature 1e-5
+    fix         sen all mesh/surface file STL/REAL/SENSOR.stl type 2 scale 0.001 curvature 1e-5
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    fix         inface all mesh/surface file STL/BULK_EXTRUDE.stl type 4 scale 0.001 curvature 1e-5
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    fix         wall all wall/gran model hertz tangential history rolling_friction epsd2 mesh n_meshes 9 meshes beam u_b l_b g_l g_r f_f f_b gst sen limitForce on # 9 u_b l_b g_l g_r f_f f_b gst sen limitForce on  # ;noTension on
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------- PARTICLE_INSERTION ------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    group       spheres region reg
+    #;group       clumps region reg
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    #;fix         integrClumps clumps multisphere
+   ## fix         integrSpheres spheres nve/sphere
+   fix         integr all nve/sphere
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------                                                                       
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------- MEASUREMENT ---------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------------- MASS_FLOW ----------------------------------------------------------------------------------------------
+
+    fix         mfs all mesh/surface/planar file STL/MASS_FLOW_SURF.stl type 4 scale 0.001
+    fix         mass1 all massflow/mesh mesh mfs vec_side 0. 0. -1 count once
+
+    variable    add_mass equal f_mass1[1]
+    variable    massflow equal f_mass1[3]
+    variable    msys equal mass(all)
+    variable    t equal step*dt
+
+    fix         outputmassflow all print ${dump_step} "$t,${msys},${add_mass},${massflow}" file MEASUREMENT/MASSFLOW.csv title "t,msys,add_mass,massflow" screen no
+
+#-------------------------------------------------------------------------------- CONTACT_FORCES -------------------------------------------------------------------------------------------
+
+    variable    fw1 equal f_beam[1]
+    variable    fw2 equal f_beam[2]
+    variable    fw3 equal f_beam[3]
+
+    fix         outputforce all print 1 "$t,${fw1},${fw2},${fw3}" file MEASUREMENT/FORCES.csv screen no title "t,fwx,fwy,fwz"
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------- OUTPUT_SETTINGS ------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+
+    fix             ts all check/timestep/gran ${dump_step} 0.1 0.1
+    compute         1 all erotate/sphere
+    status_style    custom step atoms v_t # v_fw1 v_fw2 v_fw3
+    thermo          1 #${dump_step}
+    thermo_modify   lost ignore norm no
+	neigh_modify stencil_check no
+    #compute_modify  thermo_temp dynamic yes
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------- DUMP_FILE_DEFINITIONS ---------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+##CRI
+    #dump        dumpstl_01 all stl 1 POST/all*.stl u_b l_b g_l g_r gst sen
+    #run 0
+    #undump      dumpstl_01
+###/CRI
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    #dump        dumpstl_02 all stl ${dump_step} POST/flap*.stl f_f f_b #Ordner: Post
+    #dump        dumpstl_03 all stl ${dump_step} POST/beam*.stl beam
+    ##dump        dumpstl all stl ${dump_step} post/beam*.stl beam
+    ##dump        dumpfem all fem ${cpl_step}  ../FORCES/forces_*.csv
+    ##dump        dumpVTK all mesh/vtk ${dump_step} post/forces_*.vtk output original id FEMElement FEMFace stress stresscomponents vel #fem_vel surf_vel owner box
+    #dump        dumpVTK all mesh/vtk ${dump_step} POST/forces_*.vtk output face id stresscomponents vel owner beam  #Ordner: Post
+    ##dump        dmp all custom ${dump_step} post/dump_*.liggghts id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius mass #proc
+    ##fix ts_check all check/timestep/gran ${dump_step} 0.001 0.001
+	
+	dump        dumpstl_02 all stl ${dump_step} POST/flap*.stl f_f f_b #Ordner: Post
+	dump        dumpstl all stl ${dump_step} post/beam*.stl beam
+    dump        dumpfem all fem ${cpl_step}  ../FORCES/forces_*.csv beam
+    dump        dumpVTK all mesh/vtk ${dump_step} post/forces_*.vtk output original id FEMElement FEMFace f_mean f area stress stresscomponents vel beam #fem_vel surf_vel owner box
+	##dump        dumpVTK all mesh/vtk ${dump_step} post/forces_*.vtk id stress stresscomponents vel
+    # ;CHANGED 2026-10-10 (S. Reddy): particle dump every 0.05 s instead of every 1 ms (~231k particles, ~60 MB per file;
+    # ;every 1 ms would be ~5200 files / ~300 GB). Coupling, forces and NODE_COORD files are unaffected.
+    variable    particle_dump   equal   0.05/${delta_t_DEM}
+    dump        dmp all custom ${particle_dump} post/dump_*.liggghts id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius mass #proc
+	
+	##dump_modify dumpfem every 1000000
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------- START_PHASE_II -------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    run        0 #${cpl_step}                                                                                                 # ;applay load
+	dump_modify dumpfem every 1000000    ## hier war der vorher im Skript
+     ##shell       "D:\SimBa\START\Windows\02_START_BULK_ANALYSIS.bat"                                                                    # ;Start Phase 2 --> fuer Windows
+    #;shell       /S/START/02_START_BULK_ANALYSIS.sh                                                                            # ;Start Phase 2 --> fuer LINUX
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#run 10 #[OK]
+    ##fix         replaceMesh all move/mesh mesh beam replace ${dump_step} fname ..\CSV\NODE_COORD_ scale 1 cmd D:\SimBa\START\03_BULK_ANALYSIS.bat   # ;--> fuer Windows- neu HW!!
+    #;fix         replaceMesh all move/mesh mesh beam replace ${dump_step} fname ../CSV/NODE_COORD_ scale 1 cmd /S/START/03_BULK_ANALYSIS.sh        # ;--> fuer LINUX
+#run 10000
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------    
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------- FLAP_DEFINITONS -------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+    variable    pi              equal 3.14159
+    variable    flap_angle_f    equal 90*${pi}/180                                                                      # ;flap rotational angle [rad]
+    variable    flap_angle_b    equal 90*${pi}/180                                                                      # ;flap rotational angle [rad]
+    variable    circ_angle      equal 360*${pi}/180
+
+    variable    flap_rot_time   equal 0.200                                                                             # ;time for flap rotation [sec]
+
+    variable    T_flap_f        equal (${flap_rot_time}*${circ_angle})/${flap_angle_f}                                  # ;flap period [s]
+    variable    T_flap_b        equal (${flap_rot_time}*${circ_angle})/${flap_angle_b}                                  # ;flap period [s]
+
+	fix         rot_flap_f all move/mesh mesh f_f rotate origin 0.0 -0.107 1.116 axis -1.0 0. 0. period ${T_flap_f}     # ;rotate flap front
+    fix         rot_flap_b all move/mesh mesh f_b rotate origin 0.0 0.107 1.116 axis 1.0 0. 0. period ${T_flap_b}       # ;rotate flap back 
+    
+    variable    flap_rot_step   equal ${flap_rot_time}/${delta_t_DEM}                                                   # ;steps for flap rotation [-]   
+#runs up to here
+
+    run         ${flap_rot_step}
+
+    unfix       rot_flap_f
+    unfix       rot_flap_b
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    #run     2000000
+	run     ${insertsteps}
+    print   "all done"
+	
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------- END -------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
