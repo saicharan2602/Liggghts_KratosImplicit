@@ -28,12 +28,16 @@ import sheet_io as IO  # noqa: E402
 STATUS_JSON = ST.STATUS_DIR / "status.json"
 
 
-def heartbeat_age():
-    hb = IO.read_json(ST.STATUS_DIR / "heartbeat.json") or {}
-    try:
-        return time.time() - float(hb["wall_time"])
-    except (KeyError, TypeError, ValueError):
-        return float("inf")
+def heartbeat_wall_time():
+    """wall_time of heartbeat.json, or None; a read may fail for a moment while the server replaces it
+    (Windows) -> retry ~0.5 s."""
+    for _ in range(10):
+        hb = IO.read_json(ST.STATUS_DIR / "heartbeat.json") or {}
+        try:
+            return float(hb["wall_time"])
+        except (KeyError, TypeError, ValueError):
+            time.sleep(0.05)
+    return None
 
 
 def read_status():
@@ -91,7 +95,8 @@ def main(argv):
         return done(1, f"PLANNED STOP: {st.get('message')} -- LIGGGHTS stops after its retries (intended)")
     if state == "STOPPED":
         return done(1, f"server stopped ({st.get('message')})")
-    age = heartbeat_age()
+    last_beat = heartbeat_wall_time()
+    age = time.time() - last_beat if last_beat is not None else float("inf")
     if age > ST.HEARTBEAT_STALE_S:
         make_failed(f"heartbeat {age:.0f} s old before window {n}")
         return done(1, f"no heartbeat for {age:.0f} s -- server dead? see LOG\\fem_server_stderr.log")
@@ -115,7 +120,10 @@ def main(argv):
                 if target.exists() and done_flag.exists():      # window N written just before the stop
                     return done(0, "done")
                 return done(1, f"server ended: {st.get('message')}")
-            age = heartbeat_age()
+            wt = heartbeat_wall_time()
+            if wt is not None:                    # unreadable: count from the last good heartbeat
+                last_beat = wt
+            age = time.time() - last_beat
             if age > ST.HEARTBEAT_STALE_S:
                 make_failed(f"heartbeat {age:.0f} s old in window {n}")
                 return done(1, f"no heartbeat for {age:.0f} s while waiting for window {n}")

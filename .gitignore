@@ -14,6 +14,7 @@ __pycache__/
 /LIGGGHTS/post/*
 /LIGGGHTS/POST/*
 /LIGGGHTS/MEASUREMENT/*
+/LIGGGHTS/warnings.liggghts
 !**/.gitkeep
 !/LOG/lmp_diff.txt
 !/RESULTS/checks.txt

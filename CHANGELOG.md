@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026-10-25: heartbeat read race (first full run FAILED at window 182)
+
+- The first full run stopped at window 182 (t = 0.182 s, still zero forces):
+  `fem_cmd: heartbeat inf s old in window 182`. The server was alive; `fem_cmd.py` read
+  `STATUS\heartbeat.json` at the moment the server replaced it (Windows), got no `wall_time`,
+  took the age as infinite and set the sticky FAILED. Reproduced: 29 of 5860 reads failed under a fast writer.
+- `fem_cmd.py`: the heartbeat read retries ~0.5 s (as `read_status` already did); an unreadable heartbeat
+  while waiting counts from the last good one, so only a heartbeat really older than 300 s fails the run.
+  0 of 6320 reads failed in the same test.
+- `START\Windows\CLEAN.bat [/y]`: empties every run-output folder for a fresh run (keeps `checks.txt`,
+  `lmp_diff.txt`, `.gitkeep`). It asks first and refuses while the server runs (`fem_server.py idle`, the
+  heartbeat test of `preflight`, now with the same read retry).
+
 ## 2026-10-24: setup
 
 - Built from scratch as a simple version of `DrawDown_Kratos_Implicit` (same handshake and ANSYS

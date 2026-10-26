@@ -10,3 +10,26 @@
   [PASS] NODE_COORD_1 structure: 2727 lines (7 + 680 x 4), header, 'tri,e,1', IJK then IKL, E12.6, CRLF
   [PASS] forces reader: 340 rows read back, sums exact; 4/4 bad files rejected (339 rows, order, NaN, face 2)
   [PASS] laser: undeformed 0; rigid rotation 0.2 rad: -44.5962 mm = -220 tan(0.2) = -44.5962 mm
+=== 2026-10-25 13:46:12  check.py all: ALL PASS
+  [PASS] mesh: 385 nodes, 340 elements, 77 clamped nodes
+  [PASS] AMESH numbering: elements 1, 60, 61, 340: corners I J K L counter-clockwise from lower left
+  [PASS] laser nodes: P1 = node 204 (-10, 0) mm, P2 = node 205 (0, 0) mm
+  [PASS] E12.6: 6 examples
+  [PASS] E14.6: 4 examples
+  [PASS] NODE_COORD header line 2: examples {1: '0', 2: '1.E-03', 300: '2.99E-01', 101: '1.E-01', 1001: '1', 1002: '1.001', 5199: '5.198'}; N = 1..5200 round-trip and style
+  [PASS] NODE_COORD header line 3: 1.E-03
+  [PASS] STL NODE_COORD_0.stl: 680 facets, element ids 1..340 twice in order, face 1, CRLF, E14.6, first facet as ANSYS
+  [PASS] NODE_COORD_1 structure: 2727 lines (7 + 680 x 4), header, 'tri,e,1', IJK then IKL, E12.6, CRLF
+  [PASS] forces reader: 340 rows read back, sums exact; 4/4 bad files rejected (339 rows, order, NaN, face 2)
+  [PASS] laser: undeformed 0; rigid rotation 0.2 rad: -44.5962 mm = -220 tan(0.2) = -44.5962 mm
+  [PASS] Kratos version: KM.Kernel.Version() = 10.3."0"-Release-10.3.0-1a0e8868-Release-x86_64
+  [PASS] single core: Kratos threads 1, OMP_NUM_THREADS=1
+  [PASS] dynamic model: 340 ShellThinElementCorotational3D4N, 340 SurfaceLoadCondition3D4N, 77 clamped nodes, dt 5e-05 s, solver keys known, LinearSolversApplication.sparse_lu
+  [PASS] Rayleigh in ProcessInfo: RAYLEIGH_ALPHA 0.0, RAYLEIGH_BETA 0.0001
+  Predict() inside AnalysisStage.InitializeSolutionStep: False (False in 10.3.0 -> the server calls it once per substep)
+  [PASS] window 1, zero load: 20 substeps, Newton max 1, max |u| 0.0e+00 m
+  [PASS] window 2, uniform step load: sum Fz read -4.7604 N, applied -4.7604 N; Newton mean 14.9 max 18; uz(P1) -0.0113 mm at t = 2 ms (info)
+  [PASS] self-weight 1 g, linear: w(-10, 0) = -4.6821 mm, reference -4.682 mm +- 0.5 % (+0.00 %)
+  f = 7.653, 44.413, 47.874, 134.978, 140.378, 256.632 Hz
+  [PASS] f1: 7.653 Hz, reference 7.653 Hz +- 1 %
+  [PASS] bending 2: mode 3: 47.874 Hz, reference 47.9 Hz +- 1 %

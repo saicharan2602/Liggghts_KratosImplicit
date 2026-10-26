@@ -5,6 +5,7 @@ fem_server.py -- the resident Kratos FEM server of the coupled draw-down run
                                      'serve' detached, wait until STATUS\\status.json says READY
     python fem_server.py serve       the server itself (started by 'launch', never by hand)
     python fem_server.py preflight   RUN.bat: refuse to start in a used folder
+    python fem_server.py idle        CLEAN.bat: refuse while a server runs in this folder
 
 The server builds the Kratos model once and stays resident (no FEM restart files):
 
@@ -523,14 +524,30 @@ def launch():
     return 1
 
 
+def server_running():
+    """A server of this folder beats (heartbeat < 30 s old, not ended). The read retries ~0.5 s:
+    it may fail for a moment while the server replaces heartbeat.json."""
+    for _ in range(10):
+        hb = IO.read_json(HEARTBEAT_JSON)
+        if hb is not None or not HEARTBEAT_JSON.exists():
+            break
+        time.sleep(0.05)
+    hb = hb or {}
+    return time.time() - float(hb.get("wall_time", 0)) < 30 and hb.get("state") not in ("DONE", "STOPPED", "FAILED")
+
+
 def preflight():
     """RUN.bat: one run per folder."""
     if IO.numbers_in(ST.CSV_DIR, "NODE_COORD", "csv"):
-        print("ERROR: CSV\\ already holds NODE_COORD files. One run per folder: copy the clean folder "
-              "for a new run (see README).")
+        print("ERROR: CSV\\ already holds NODE_COORD files. One run per folder: run CLEAN.bat or copy "
+              "the clean folder for a new run (see README).")
         return 1
-    hb = IO.read_json(HEARTBEAT_JSON) or {}
-    if time.time() - float(hb.get("wall_time", 0)) < 30 and hb.get("state") not in ("DONE", "STOPPED", "FAILED"):
+    return idle()
+
+
+def idle():
+    """CLEAN.bat, RUN.bat: refuse while a server runs in this folder."""
+    if server_running():
         print("ERROR: a Kratos server is still running in this folder -- STOP.bat first.")
         return 1
     return 0
@@ -538,9 +555,9 @@ def preflight():
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="resident Kratos FEM server")
-    ap.add_argument("mode", choices=("launch", "serve", "preflight"))
+    ap.add_argument("mode", choices=("launch", "serve", "preflight", "idle"))
     a = ap.parse_args(argv)
-    return {"launch": launch, "serve": serve, "preflight": preflight}[a.mode]()
+    return {"launch": launch, "serve": serve, "preflight": preflight, "idle": idle}[a.mode]()
 
 
 if __name__ == "__main__":

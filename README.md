@@ -39,10 +39,14 @@ All constants are in `KRATOS\settings.py`; every change goes into `CHANGELOG.md`
    `RESULTS\laser_vs_experiment.png` and `RESULTS\report.md`.
 5. **`STOP.bat`** stops a run: Kratos finishes the current window and exits; then close the LIGGGHTS
    window.
+6. **`CLEAN.bat`** before a fresh run in the same folder: asks, then empties `CSV\`, `FORCES\`,
+   `STATUS\`, `STL\`, `LOG\`, `RESULTS\` and `LIGGGHTS\post` (= `POST`), `MEASUREMENT`, and deletes
+   `LIGGGHTS\warnings.liggghts`. It keeps `RESULTS\checks.txt`, `LOG\lmp_diff.txt` and the `.gitkeep`
+   files, and refuses while the Kratos server of this folder runs. `CLEAN.bat /y` does not ask.
 
 **One run per folder.** `RUN.bat` refuses to start if `CSV\` already holds `NODE_COORD_*` files. For a new
-run, copy the folder and empty `CSV\`, `FORCES\`, `STATUS\`, `LOG\`, `RESULTS\` and `LIGGGHTS\post`,
-`POST`, `MEASUREMENT` (keep `RESULTS\checks.txt` if you like).
+run, run `CLEAN.bat` (the old results are deleted), or copy the folder first if you want to keep them
+and run `CLEAN.bat` in the copy.
 
 ## What happens during a run
 

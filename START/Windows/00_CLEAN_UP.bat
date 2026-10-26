@@ -7,7 +7,7 @@ rem  otherwise it removes what a failed start may have left (STATUS, FORCES, las
 rem  and creates the folders.
 call "%~dp000_SETTINGS.bat"
 if exist "%DDK_ROOT%\CSV\NODE_COORD_*.csv" (
-    echo ERROR: CSV\ already holds NODE_COORD files - copy the folder for a new run
+    echo ERROR: CSV\ already holds NODE_COORD files - run CLEAN.bat or copy the folder for a new run
     exit /b 1
 )
 for %%D in (STL CSV FORCES STATUS LOG RESULTS LIGGGHTS\post LIGGGHTS\POST LIGGGHTS\MEASUREMENT) do (
